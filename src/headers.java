@@ -22,23 +22,13 @@ public class headers {
     this.seq = seq;
     }
 
-    public static byte[] intToBytes(int my_int) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput out = new ObjectOutputStream(bos);
-        out.writeInt(my_int);
-        out.close();
-        byte[] int_bytes = bos.toByteArray();
-        bos.close();
-        return int_bytes;
-    }
-
     public static String hexToBinary(String hex) {
         int i = Integer.parseInt(hex, 16);
         String bin = Integer.toBinaryString(i);
         return bin;
     }
 
-    public static String stuffer(String binary){
+    public  String stuffer(String binary){
         if(binary.length() < 8){
             int increase = 8 - binary.length();
             for(int i =0;i<increase;i++){
@@ -47,9 +37,5 @@ public class headers {
         }
     return binary;
     }
-   public static void main(String[] args){
 
-           System.out.println(stuffer(hexToBinary("4")));
-
-   }
 }
