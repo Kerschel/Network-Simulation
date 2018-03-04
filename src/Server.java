@@ -10,37 +10,22 @@ public class Server {
         int end = 0x7E;
 
         ServerSocket s = new ServerSocket(PORT);
-        System.out.println("Started: " + s);
 
+        System.out.println("Started: " + s);
+        Socket socket = s.accept();
+
+        BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
+        System.out.println("Connection accepted: " + socket);
 
         while (true) {
-            Socket socket = s.accept();
-            try {
-                System.out.println("Connection accepted: " + socket);
-                BufferedReader in =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        socket.getInputStream()));
-
-                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
-                String frame = in.readLine();
-                System.out.println("Echoing: " + frame);
-//                String starting = frame.substring(0,7);
-//                String seq = frame.substring(8,15);
-//                String error = frame.substring(16,23);
-//                String payload = frame.substring(24,63);
-//                out.println(str);
-
-
-            } finally {
-                System.out.println("closing...");
-                socket.close();
-            }
-
+            String frame = inFromClient.readLine();
+//            System.out.println(frame);
+            DataLinkLayer data = new DataLinkLayer(frame);
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            System.out.println(data.getSeq());
+            out.writeBytes(data.getSeq() + "\n");
         }
-
     }
-
-//   start seqnum error payload endofbit endflag
 }
+//   start seqnum error payload endofbit endflag
