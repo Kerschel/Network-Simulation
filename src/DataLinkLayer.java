@@ -8,19 +8,48 @@ public class DataLinkLayer {
     String endflag;
     String seq;
     String payload;
-    String packetend;
-
+    String endOfPacket;
+    int FRAME_SIZE  =480;
 
     public DataLinkLayer(String start, String end, String seq, String payload, String packetend){
     this.startflag = stuffer(hexToBinary(start));
     this.endflag = stuffer(hexToBinary(end));
-    this.packetend = packetend;
-    this.payload = hexToBinary(payload);
-    if(this.payload.length() <60){
-        this.payload = stuffer(payload);
-    }
+    this.endOfPacket = stuffer(Integer.toBinaryString(Integer.valueOf(packetend)));
+    this.payload = payload;
+        System.out.println(this.payload.length());
+//    if(this.payload.length() <(60*8)){//making into 60 bytes
+//        while(this.payload.length() != FRAME_SIZE)
+//            this.payload = "0" + this.payload;
+//        }
+    this.payload = BitStuff();
     this.seq = stuffer(Integer.toBinaryString(Integer.valueOf(seq)));
     }
+
+    public String BitStuff(){
+        int counter =0;
+        String save = "";
+        for(int i=0;i<this.payload.length();i++)
+        {
+
+            if(this.payload.charAt(i) == '1')
+            {
+                counter++;
+                save +=  this.payload.charAt(i);
+            }
+            else
+            {
+                save += this.payload.charAt(i);
+                counter = 0;
+            }
+            if(counter == 5)
+            {
+                save += '0' ;
+                counter = 0;
+            }
+        }
+        return save;
+    }
+
 
 
 
@@ -40,7 +69,7 @@ public class DataLinkLayer {
     }
 
     public String returnFrame(){
-        return startflag + seq + payload + packetend + endflag;
+        return startflag + seq + payload  + endflag + endOfPacket;
     }
 
     public static String CalculateError(String payload){
@@ -55,16 +84,6 @@ public class DataLinkLayer {
     }
 
 
-
-    public DataLinkLayer(String frame){
-//   start seq error payload endofbit endflag
-        this.startflag = frame.substring(0,8);
-        this.seq = frame.substring(8,16);
-
-//        String error = frame.substring(16,23);
-//        8*60 to know how many bits is the payload
-//        String payload = frame.substring(16,8*60);
-    }
 
        public static void main(String[] args){
        String payload = "8b8077a4c50ef2770d335d0b72c10a64";
@@ -90,7 +109,7 @@ public class DataLinkLayer {
     }
 
     public String getPacketend() {
-        return packetend;
+        return endOfPacket;
     }
 
 }
