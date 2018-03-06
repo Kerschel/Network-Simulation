@@ -8,10 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Client {
-    public static final int FRAME_SIZE = 200;
+    public static final int FRAME_SIZE = 480;
     public static int i;
 
     public static void main(String[] args) throws IOException {
+        Random rand = new Random();
         File myFile = new File("input.txt");
         FileInputStream myStream = new FileInputStream(myFile);
         Scanner in = new Scanner(myStream);
@@ -39,7 +40,7 @@ public class Client {
                     packetend = "1";
                 }
 
-                clientLog(1, i, 1);
+                clientLog(j, i, 1);
 
                 DataLinkLayer dataLinkLayer = new DataLinkLayer("7E", "7E", String.valueOf(i),payload, packetend);
                 outToServer.writeBytes(dataLinkLayer.returnFrame() + "\n");
@@ -60,7 +61,7 @@ public class Client {
                             e1.printStackTrace();
                         }
                     }
-                }, 2 * 30 * 1000);
+                },  10 * 1000);
 
 //                        Get ACK from server
                 String ACK = inFromServer.readLine();
@@ -115,11 +116,9 @@ socket.close();
 
         packetSize = in.nextInt();
         packetData = in.next();
-        System.out.println(packetData);
 
         binary = hexadeciamlToBinary(packetData);
         currentPayload = binary;
-        System.out.println("Packet length: " + binary.length());
 
 
         while (binary.length() > 0) {

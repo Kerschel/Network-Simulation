@@ -7,6 +7,11 @@ public class DataLinkLayer {
     String startflag;
     String endflag;
     String seq;
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
+
     String payload;
     String endOfPacket;
     int FRAME_SIZE  =480;
