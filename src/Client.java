@@ -25,14 +25,15 @@ public class Client {
         System.out.println("socket = " + socket);
         DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+        int error =0;
         for(int j = 1; j <= numPackets; j++){
+
             frames = readPacket(in);
 
             boolean send = true;
             int sequence = frames.size();
             for (i = 1; i <= sequence; i++) {
-
+            error ++;
                 String payload = frames.get(i-1);
 
                 String packetend = "0";
@@ -43,11 +44,14 @@ public class Client {
                 clientLog(j, i, 1);
 
                 DataLinkLayer dataLinkLayer = new DataLinkLayer("7E", "7E", String.valueOf(i),payload, packetend);
+                if(error %5 == 0) {dataLinkLayer.FlipBit();System.out.println("Hi");}
+
                 outToServer.writeBytes(dataLinkLayer.returnFrame() + "\n");
 
                 Timer timer = new Timer();
                 int frameNo = i;
                 int finalJ = j;
+                String finalPacketend = packetend;
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -56,12 +60,12 @@ public class Client {
                         try {
                             clientLog(finalJ, frameNo, 6);
                             clientLog(finalJ, frameNo, 2);
-                            outToServer.writeBytes(dataLinkLayer.returnFrame() + "\n");
+                            outToServer.writeBytes(new DataLinkLayer("7E", "7E", String.valueOf(i),payload, finalPacketend).returnFrame() + "\n");
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
                     }
-                },  10 * 1000);
+                },  10 * 1000); // wait for 10 secs
 
 //                        Get ACK from server
                 String ACK = inFromServer.readLine();
@@ -69,10 +73,18 @@ public class Client {
                 if (Integer.parseInt(ACK, 2) == i) {
                     timer.cancel();
                     clientLog(j, i, 4);
-                    System.out.println("Canceled");
-                } else
-//   so if get wrong ack send = false will resend the same packet at top
-                    i=i-1;
+                } else{
+                    //   so if get wrong ack send = false will resend the same packet at top
+//                    i=i-1;
+                    clientLog(j, i, 5);
+                    clientLog(j, i, 2);
+                    timer.cancel();
+                    dataLinkLayer = new DataLinkLayer("7E", "7E", String.valueOf(i),payload, packetend);
+                    outToServer.writeBytes(dataLinkLayer.returnFrame() + "\n");
+                    String ack = inFromServer.readLine();
+                    clientLog(j, i, 4);
+                }
+
             }
             clientLog(j, i, 3);
         }
@@ -118,6 +130,7 @@ socket.close();
         packetData = in.next();
 
         binary = hexadeciamlToBinary(packetData);
+        binary = binary.replace(" ","");
         currentPayload = binary;
 
 

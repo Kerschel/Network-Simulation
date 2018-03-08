@@ -10,13 +10,11 @@ public class Server {
     public static final int PORT = 6500;
     public static ArrayList <String> sequenceList = new ArrayList<>();
     public static void main(String[] args) throws IOException {
-        int start = 0x7E;
-        int end = 0x7E;
 
         ServerSocket s = new ServerSocket(PORT);
 
         System.out.println("Started: " + s);
-        while(true) {
+//        while(true) {
             Socket socket = s.accept();
 
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -24,15 +22,19 @@ public class Server {
             String frame = "";
             String message = "";
             int error=0;
+            int i =1;
+            int j = 1;
             String packet = "";
             while (!frame.equals("break")) {
+
                 error = error +1;
                 frame = inFromClient.readLine();
                 if (frame != null && !frame.equals("break")) {
                     ServerDataLinkLayer data = new ServerDataLinkLayer(frame);
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 //                    8 bits first for start bit then 8 for sequence #
-                    String remainder = frame.substring(16);
+                    String remainder = frame.substring(24);
+                    String Crc = frame.substring(16,24);
 
                     String endOfPacket = remainder.substring(remainder.indexOf(data.getStartflag()));
                     endOfPacket = String.valueOf(endOfPacket.charAt(endOfPacket.length()-1));
@@ -40,65 +42,60 @@ public class Server {
 //                  Extract the payload from the frame
                     String payload = remainder.substring(0,remainder.indexOf(data.getStartflag()));
 //                  Unstuff payload now
-                    payload = unStuff(payload);
+                    payload = new DataLinkLayer().unStuff(payload);
 
-                    if(endOfPacket.equals("0") && sequenceList.indexOf(data.getSequence()) < 0){ // so if that sequence was never sent before
-                    message += payload;
-                    sequenceList.add(data.getSequence());
-                    }
-                    else if(endOfPacket.equals("1") && sequenceList.indexOf(data.getSequence()) <0){ // So here we have the entire packet together
-                        message += payload;
-                         // so if that sequence was never sent before
-                        sequenceList.add(data.getSequence());
+                    serverLog(i,j,1);
+                    j++;
+                    String inputData = payload + Crc;
+                    if(new CRC().validateData(inputData ) && ((error%8) !=0)){ // if it is true
+
+
+                        if(endOfPacket.equals("0") && sequenceList.indexOf(data.getSequence()) < 0){ // so if that sequence was never sent before
+                            message += payload;
+                            sequenceList.add(data.getSequence());
+                        }
+                        else if(endOfPacket.equals("1") && sequenceList.indexOf(data.getSequence()) <0){ // So here we have the entire packet together
+                            i++;
+//                            Packet received
+                            serverLog(j,i,3);
+                            message += payload;
+                            // so if that sequence was never sent before
+                            sequenceList.add(data.getSequence());
 //                        end of packet
-                        System.out.println(message);
-                        message ="";
-                        sequenceList.clear();
+//                            TODO this is the message that you will have to change to hex to store in the file
+                            System.out.println(message + " Sequence " + data.getSequence());
+                            message ="";
+                            sequenceList.clear();
+                            j=1;
+
+                        }
+                        else if(sequenceList.indexOf(data.getSequence()) > 0){//duplicate packet or frame sent
+                            serverLog(i,j,4);
+                        }
+//                        ACK sent
+                        serverLog(i,j,5);
+                        out.writeBytes(data.getSequence() + "\n");
+                    }else {
+                        if (!new CRC().validateData(inputData )) { // wrong crc calculated so want them to resend
+                            serverLog(i, j, 2);
+                            out.writeBytes("00010011" + "\n");
+                        }
+                        else{//everything is well just want to simulate a error
+                            serverLog(i, j, 5);
+                            out.writeBytes("00010011" + "\n");
+                        }
                     }
 
-                    if(error ==8){ //send ack with error. So sending 9 as the seq # to make it look like a error
-                        error =0;
-                        String bad = data.getSequence();
-                        bad = Integer.toBinaryString(9);
-                        out.writeBytes(bad + "\n");
-                    }
-                    else{
-                        out.writeBytes(data.getSequence() + "\n");
-                    }
+
+
 
                 }
             }
+            socket.close();
         }
-    }
+//    }
 
 
-    public static String unStuff(String payload){
-        int counter=0;
-        String save = "";
-        for(int i=0;i< payload.length();i++)
-        {
-            if(payload.charAt(i) == '1')
-            {
-                counter++;
-                save = save + payload.charAt(i);
-            }
-            else
-            {
-                save = save + payload.charAt(i);
-                counter = 0;
-            }
-            if(counter == 5)
-            {
-                if((i+2)!=payload.length())
-                    save = save + payload.charAt(i+2);
-                else
-                    save=save + '1';
-                i=i+2;
-                counter = 1;
-            }
-        }
-        return save;
-    }
 
     public static void serverLog(int packet, int frame, int state) throws IOException {
         PrintWriter log = new PrintWriter(new FileOutputStream(
@@ -112,7 +109,7 @@ public class Server {
         } else if (state == 2) {// frame resent
             log.println(time + " Frame:" + frame + "  Packet:" + packet + " Received in error");
         } else if (state == 3) {// Packet sent
-            log.println(time + " Packet:" + packet + " Sent");
+            log.println(time + "Entire Packet:" + packet + " Received");
         } else if (state == 4) {// duplicate frame
             log.println(time + " Frame:" + frame + " Packet:" + packet + " Duplicate received");
         } else if (state == 5) {//Ack sent

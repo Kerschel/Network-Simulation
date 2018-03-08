@@ -14,6 +14,7 @@ public class DataLinkLayer {
 
     String payload;
     String endOfPacket;
+    String crc = " ";
     int FRAME_SIZE  =480;
 
     public DataLinkLayer(String start, String end, String seq, String payload, String packetend){
@@ -21,10 +22,9 @@ public class DataLinkLayer {
     this.endflag = stuffer(hexToBinary(end));
     this.endOfPacket = stuffer(Integer.toBinaryString(Integer.valueOf(packetend)));
     this.payload = payload;
+    CRC crc = new CRC();
+    this.crc = crc.computeCRC(payload);
         System.out.println(this.payload.length());
-//    if(this.payload.length() <(60*8)){//making into 60 bytes
-//        while(this.payload.length() != FRAME_SIZE)
-//            this.payload = "0" + this.payload;
 //        }
     this.payload = BitStuff();
     this.seq = stuffer(Integer.toBinaryString(Integer.valueOf(seq)));
@@ -73,29 +73,23 @@ public class DataLinkLayer {
     return binary;
     }
 
+    public void FlipBit(){
+        char[] characters = crc.toCharArray();
+        int rand = (int)(Math.random() * crc.length());
+            if(characters[rand] == '0')
+                characters[rand] ='1';
+            else characters[rand] = '0';
+
+            this.crc = new String (characters);
+    }
+
     public String returnFrame(){
-        return startflag + seq + payload  + endflag + endOfPacket;
-    }
-
-    public static String CalculateError(String payload){
-        int mid = payload.length()/2;
-        String[] parts = {payload.substring(0, mid),payload.substring(mid)};
-
-
-        int num1 =  Integer.parseInt(parts[1],2);
-        int num2 =  Integer.parseInt(parts[0],2);
-
-        return Integer.toBinaryString(num1+num2);
+        System.out.println(crc);
+        return startflag + seq +crc+ payload  + endflag + endOfPacket;
     }
 
 
 
-       public static void main(String[] args){
-       String payload = "8b8077a4c50ef2770d335d0b72c10a64";
-
-           System.out.println(CalculateError("0000110100110011010111010000101101110010110000010000101001100100"));
-
-   }
 
     public String getStartflag() {
         return startflag;
@@ -117,4 +111,37 @@ public class DataLinkLayer {
         return endOfPacket;
     }
 
+
+
+public DataLinkLayer(){
+
+}
+
+    public String unStuff(String payload){
+        int counter=0;
+        String save = "";
+        for(int i=0;i< payload.length();i++)
+        {
+            if(payload.charAt(i) == '1')
+            {
+                counter++;
+                save = save + payload.charAt(i);
+            }
+            else
+            {
+                save = save + payload.charAt(i);
+                counter = 0;
+            }
+            if(counter == 5)
+            {
+                if((i+2)!=payload.length())
+                    save = save + payload.charAt(i+2);
+                else
+                    save=save + '1';
+                i=i+2;
+                counter = 1;
+            }
+        }
+        return save;
+    }
 }
