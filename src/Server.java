@@ -1,5 +1,6 @@
 import java.io.*;
 import java.lang.reflect.Array;
+import java.math.BigInteger;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ public class Server {
 
     public static final int PORT = 6500;
     public static ArrayList <String> sequenceList = new ArrayList<>();
+
     public static void main(String[] args) throws IOException {
 
         ServerSocket s = new ServerSocket(PORT);
@@ -21,6 +23,9 @@ public class Server {
             System.out.println("Connection accepted: " + socket);
             String frame = "";
             String message = "";
+            String hex; //Used to store the hexadecimal representation of the payload received from the client.
+            String outputFileName = "output.txt";//The filename of the output file where we will write the data received from the client.
+            PrintWriter outputData = new PrintWriter(new FileOutputStream(new File(outputFileName), true));
             int error=0;
             int i =1;
             int j = 1;
@@ -62,7 +67,9 @@ public class Server {
                             // so if that sequence was never sent before
                             sequenceList.add(data.getSequence());
 //                        end of packet
-//                            TODO this is the message that you will have to change to hex to store in the file
+//                            TODO: this is the message that you will have to change to hex to store in the file: Completed
+                            hex = new BigInteger(message, 2).toString(16);//Convert the binary message received from the client to hexadecimal
+                            outputData.println(hex);//output the hexadecimal message to the output file.
                             System.out.println(message + " Sequence " + data.getSequence());
                             message ="";
                             sequenceList.clear();
@@ -92,6 +99,7 @@ public class Server {
                 }
             }
             socket.close();
+            outputData.close();
         }
 //    }
 
