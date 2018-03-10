@@ -65,7 +65,7 @@ public class Client {
                             e1.printStackTrace();
                         }
                     }
-                },  10 * 1000); // wait for 10 secs
+                },  10 *  1000); // wait for 10 secs
 
 //                        Get ACK from server
                 String ACK = inFromServer.readLine();
@@ -130,7 +130,6 @@ socket.close();
         packetData = in.next();
 
         binary = hexadeciamlToBinary(packetData);
-        binary = binary.replace(" ","");
         currentPayload = binary;
 
 
