@@ -1,0 +1,40 @@
+43:41:217 Frame:1 Packet:1 Sent
+43:41:283 Frame:1 Packet:1 ACK received
+43:41:284 Complete Packet:1 Sending
+43:41:286 Frame:1 Packet:2 Sent
+43:41:302 Frame:1 Packet:2 ACK received
+43:41:302 Frame:2 Packet:2 Sent
+43:41:317 Frame:1 Packet:2 ACK received
+43:41:317 Frame:2 Packet:2 Sent
+43:41:349 Frame:2 Packet:2 ACK received
+43:41:349 Complete Packet:2 Sending
+43:41:349 Frame:1 Packet:3 Sent
+43:41:364 Frame:1 Packet:3 ACK received in error
+43:41:364 Frame:1  Packet:3 Resent
+43:41:392 Frame:1 Packet:3 ACK received
+43:41:393 Frame:2 Packet:3 Sent
+43:41:409 Frame:1 Packet:3 ACK received
+43:41:410 Frame:2 Packet:3 Sent
+43:46:425 Frame:2 Packet:3 Timer Expired
+43:46:425 Frame:2  Packet:3 Resent
+43:46:463 Frame:2 Packet:3 ACK received
+43:46:463 Frame:3 Packet:3 Sent
+43:46:479 Frame:3 Packet:3 ACK received
+43:46:479 Frame:4 Packet:3 Sent
+43:46:510 Frame:4 Packet:3 ACK received
+43:46:510 Frame:5 Packet:3 Sent
+43:46:526 Frame:5 Packet:3 ACK received in error
+43:46:526 Frame:5  Packet:3 Resent
+43:46:541 Frame:5 Packet:3 ACK received
+43:46:541 Complete Packet:3 Sending
+43:46:541 Frame:1 Packet:4 Sent
+43:46:561 Frame:1 Packet:4 ACK received
+43:46:562 Frame:2 Packet:4 Sent
+43:46:563 Frame:1 Packet:4 ACK received
+43:46:563 Frame:2 Packet:4 Sent
+43:51:586 Frame:2 Packet:4 Timer Expired
+43:51:586 Frame:2  Packet:4 Resent
+43:51:632 Frame:2 Packet:4 ACK received
+43:51:632 Frame:3 Packet:4 Sent
+43:51:665 Frame:3 Packet:4 ACK received
+43:51:667 Complete Packet:4 Sending

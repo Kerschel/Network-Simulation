@@ -1,9 +1,7 @@
-import com.sun.istack.internal.Nullable;
 
 import java.math.BigInteger;
 import java.net.*;
 import java.io.*;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -12,8 +10,8 @@ public class Client {
     public static int i;
 
     public static void main(String[] args) throws IOException {
-        Random rand = new Random();
-        File myFile = new File("input.txt");
+        newFile();
+        File myFile = new File("input.raw");
         FileInputStream myStream = new FileInputStream(myFile);
         Scanner in = new Scanner(myStream);
         int numPackets = in.nextInt();
@@ -23,6 +21,8 @@ public class Client {
 
         Socket socket = new Socket(addr, 6500);
         System.out.println("socket = " + socket);
+        System.out.println("Please wait Sending...");
+
         DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         int error =0;
@@ -31,20 +31,23 @@ public class Client {
             frames = readPacket(in);
 
             boolean send = true;
-            int sequence = frames.size();
+            int sequence = frames.size(); // The packet chopped up into frames after reading the line from the file.
             for (i = 1; i <= sequence; i++) {
             error ++;
                 String payload = frames.get(i-1);
 
                 String packetend = "0";
+
+
+                clientLog(j, i, 1);
+                if(error %3 == 0 && i ==2){
+                    i--;// to simulate sending a duplicate packet/frame. It was not specified when this should be done
+                }
                 if (i == sequence) {
                     packetend = "1";
                 }
-
-                clientLog(j, i, 1);
-
                 DataLinkLayer dataLinkLayer = new DataLinkLayer("7E", "7E", String.valueOf(i),payload, packetend);
-                if(error %5 == 0) {dataLinkLayer.FlipBit();System.out.println("Hi");}
+                if(error %5 == 0) {dataLinkLayer.FlipBit();}
 
                 outToServer.writeBytes(dataLinkLayer.returnFrame() + "\n");
 
@@ -55,8 +58,10 @@ public class Client {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("timeout");
+                        System.out.println("Client timer finish");
 //                      resend previous frame because no ACK received
+                        System.out.println("Resending...");
+
                         try {
                             clientLog(finalJ, frameNo, 6);
                             clientLog(finalJ, frameNo, 2);
@@ -65,7 +70,7 @@ public class Client {
                             e1.printStackTrace();
                         }
                     }
-                },  10 *  1000); // wait for 10 secs
+                },  5 *  1000); // wait for 5 secs
 
 //                        Get ACK from server
                 String ACK = inFromServer.readLine();
@@ -75,7 +80,6 @@ public class Client {
                     clientLog(j, i, 4);
                 } else{
                     //   so if get wrong ack send = false will resend the same packet at top
-//                    i=i-1;
                     clientLog(j, i, 5);
                     clientLog(j, i, 2);
                     timer.cancel();
@@ -88,6 +92,8 @@ public class Client {
             }
             clientLog(j, i, 3);
         }
+        System.out.println("Transmission Complete");
+
         outToServer.writeBytes("break");
 socket.close();
     }
@@ -95,7 +101,7 @@ socket.close();
 
     public static void clientLog(int packet, int frame, int state) throws IOException {
         PrintWriter log = new PrintWriter(new FileOutputStream(
-                new File("client.log"),
+                new File("logs/client.log"),
                 true /* append = true */));
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat time_formatter = new SimpleDateFormat("mm:ss:S");
@@ -105,7 +111,7 @@ socket.close();
         } else if (state == 2) {// frame resent
             log.println(time + " Frame:" + frame + "  Packet:" + packet + " Resent");
         } else if (state == 3) {// Packet sent
-            log.println(time + " Packet:" + packet + " Sent");
+            log.println(time + " Complete Packet:" + packet + " Sending");
         } else if (state == 4) {// Ack Received successfully
             log.println(time + " Frame:" + frame + " Packet:" + packet + " ACK received");
         } else if (state == 5) {//Ack received in error
@@ -141,11 +147,15 @@ socket.close();
                 currentPayload = binary;
                 binary = "";
             }
-//            System.out.println(currentPayload);
             frames.add(currentPayload);
         }
         return frames;
     }
     public static ArrayList<String> frames = new ArrayList<>();
 
+    public static void newFile() throws FileNotFoundException {
+        PrintWriter writer = new PrintWriter("logs/client.log");
+        writer.print("");
+        writer.close();
+    }
 }

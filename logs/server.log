@@ -1,0 +1,41 @@
+43:41:248 Frame:1 Packet:1 Received
+43:41:264 Entire Packet:1 Received
+43:41:281 Frame:1 Packet:1 ACK sent
+43:41:286 Frame:2 Packet:2 Received
+43:41:302 Frame:2 Packet:1 ACK sent
+43:41:317 Frame:3 Packet:2 Received
+43:41:317 Frame:3 Packet:2 Duplicate received
+43:41:317 Frame:2 Packet:1 ACK sent
+43:41:333 Frame:3 Packet:2 Received
+43:41:333 Entire Packet:2 Received
+43:41:333 Frame:1 Packet:2 ACK sent
+43:41:364 Frame:2 Packet:3 Received
+43:41:364 Frame:2  Packet:3 Received in error
+43:41:388 Frame:2 Packet:3 Received
+43:41:390 Frame:2 Packet:2 ACK sent
+43:41:404 Frame:3 Packet:3 Received
+43:41:405 Frame:3 Packet:3 Duplicate received
+43:41:407 Frame:2 Packet:2 ACK sent
+43:41:421 Frame:3 Packet:3 Received
+43:46:462 Frame:3 Packet:3 Received
+43:46:463 Frame:3 Packet:2 ACK sent
+43:46:479 Frame:4 Packet:3 Received
+43:46:479 Frame:4 Packet:2 ACK sent
+43:46:510 Frame:5 Packet:3 Received
+43:46:510 Frame:5 Packet:2 ACK sent
+43:46:526 Frame:6 Packet:3 Received
+43:46:526 Frame:6  Packet:3 Received in error
+43:46:541 Frame:6 Packet:3 Received
+43:46:541 Entire Packet:3 Received
+43:46:541 Frame:1 Packet:3 ACK sent
+43:46:559 Frame:2 Packet:4 Received
+43:46:560 Frame:2 Packet:3 ACK sent
+43:46:563 Frame:3 Packet:4 Received
+43:46:563 Frame:3 Packet:4 Duplicate received
+43:46:563 Frame:2 Packet:3 ACK sent
+43:46:579 Frame:3 Packet:4 Received
+43:51:617 Frame:3 Packet:4 Received
+43:51:632 Frame:3 Packet:3 ACK sent
+43:51:648 Frame:4 Packet:4 Received
+43:51:648 Entire Packet:4 Received
+43:51:648 Frame:1 Packet:4 ACK sent

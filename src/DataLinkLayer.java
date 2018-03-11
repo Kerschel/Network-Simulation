@@ -24,8 +24,7 @@ public class DataLinkLayer {
     this.payload = payload;
     CRC crc = new CRC();
     this.crc = crc.computeCRC(payload);
-        System.out.println(this.payload.length());
-//        }
+//        System.out.println(this.payload.length());
     this.payload = BitStuff();
     this.seq = stuffer(Integer.toBinaryString(Integer.valueOf(seq)));
     }
@@ -84,7 +83,6 @@ public class DataLinkLayer {
     }
 
     public String returnFrame(){
-        System.out.println(crc);
         return startflag + seq +crc+ payload  + endflag + endOfPacket;
     }
 
