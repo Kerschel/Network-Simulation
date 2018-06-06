@@ -1,5 +1,4 @@
 # Network-Simulation
-Simulates how a network sends packets over TCP protocol. All the layers are simulated with a hex file being used to represent the packets .
 
 The purpose of this is to emulate how communications at the data link layer work with
 respect to Positive Acknowledgement with Retransmission (PAR). Java code was written for a client and server processes that send and receive frames. The responsibilities
